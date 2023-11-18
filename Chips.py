@@ -12,14 +12,15 @@ def Chips():
             '1000' : 10
         }
     
-    def betChips(self, amountBetDict):
+    def betChips(self, amountBetDict, pot):
         # if player bets 5$, amountBetDict = {'5' : 1}
         for (chipValue, chipAmount) in amountBetDict:
             if self.chips[chipValue] - chipAmount >= 0:
                 self.chips[chipValue] = self.chips[chipValue] - chipAmount
+        pot.add(getTotal(amountBetDict))
     
-    def getTotal(self):
-        return sum([int(amount) * val for amount, val in self.chips])
+    def getTotal(self, chipCountDict):
+        return sum([int(amount) * val for amount, val in chipCountDict])
     
     def bigBlind(self, pot):
         self.chips[self.lowestDenom] = self.chips[self.lowestDenom] - 1
