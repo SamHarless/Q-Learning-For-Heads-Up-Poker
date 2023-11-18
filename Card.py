@@ -3,7 +3,12 @@ import random
 class Card(object):
 
     def __init__(self,suitIn, val):
+        # PLACEHOLDER CARD FOR BOARD
+        if val < 0 or suitIn < 0:
+            self.suit = -1
+            self.value = -1
 
+        # Normal card assignment
         self.suit = suitIn
         self.value = val
 
@@ -24,5 +29,13 @@ class Card(object):
             val = "King"
         else:
             val = self.value
+        if self.suit == 0:
+            s = "Hearts"
+        elif self.suit == 1:
+            s = "Diamonds"
+        elif self.suit == 2:
+            s = "Spades"
+        else:
+            s = "Clubs"
 
-        return (str(val)+" of "+str(self.suit))
+        return (str(val)+" of "+str(s))
