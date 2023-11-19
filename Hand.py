@@ -11,10 +11,10 @@ def Hand():
         self.board = [Card(-1,-1), Card(-1,-1), Card(-1,-1), Card(-1,-1), Card(-1,-1)]
 
     def decisionsMade(self):
-            for player in self.players:
-                if player.decision == None:
-                    return False
-            return True
+        for player in self.players:
+            if player.decision == None:
+                return False
+        return True
     
     def startHand(self):
         # get big blind from player
@@ -27,11 +27,28 @@ def Hand():
         fold = False
         i = 0
         while i < 4 and fold == False:
-            for player in self.players: player.decision = None
+            for player in self.players: player.resestDecision()
+            currentPlayer = self.bigBlind # big blind plays first
+            lastBet = {'0' : 0}
 
-            while self.decisionsMade == False:
-                # big blind plays first
-                self.players[self.bigBlind].playInitial()
-                if self.players[self.bigBlind].decision == 'fold':
+            while self.decisionsMade() == False:
+                print("Current Player is " + str(currentPlayer))
+                lastBet = self.players[currentPlayer].play(self.pot, lastBet)
+
+                if self.players[currentPlayer].decision == 'fold':
                     fold = True
                     break
+                elif self.players[currentPlayer].decision == 'bet' or self.players[currentPlayer].decision == 'raise':
+                    self.players[not currentPlayer].decision = None
+                    currentPlayer = not currentPlayer
+            # board for the cards
+            # win logic
+            if fold == True: 
+                break
+
+        # reward pot
+        potValue = self.pot.getValue()
+
+                    
+
+
