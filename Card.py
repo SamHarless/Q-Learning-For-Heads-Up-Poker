@@ -19,6 +19,9 @@ class Card(object):
         return self.name()
     
     def name(self):
+        if self.value == -1 and self.suit == -1:
+            return "Empty"
+
         if self.value == 1:
             val = "Ace"
         elif self.value == 11:
