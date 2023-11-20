@@ -7,6 +7,7 @@ class Player(object):
         self.id = id
         self.chips = Chips.Chips()
         self.hand = []
+        self.prevBet = 0
         self.decision = None
     
     def assignHand(self, deck):
@@ -51,7 +52,14 @@ class Player(object):
                 print("The last bet was: " + str(numLastBet))
                 choice = input("Please enter a number:\n1.....Call\n2.....Raise\n3.....See your chip count\n4.....Fold\n")
                 if int(choice) == 1:
-                    self.chips.betChips(lastBet, pot)
+                    if self.prevBet != 0:
+                        prevSum = sum([int(amount) * val for amount, val in self.prevBet.items()]) # previous amount raised by you
+                        lastSum = sum([int(amount) * val for amount, val in lastBet.items()]) # amount bet by opponent
+                        diffSum = lastSum - prevSum # difference that still needs to be paid
+                        diffDict = Chips.Chips().valueToChips(diffSum)
+                        self.chips.betChips(diffDict, pot)
+                    else:
+                        self.chips.betChips(lastBet, pot)
                     self.decision = 'call'
                 elif int(choice) == 2:
                     print("Your current total is " + str(self.chips.chips))
@@ -74,7 +82,14 @@ class Player(object):
                         else:
                             control = True
 
-                    self.chips.betChips(betsDict, pot)
+                    if self.prevBet != 0:
+                        prevSum = sum([int(amount) * val for amount, val in self.prevBet.items()]) # previous amount raised by you
+                        lastSum = sum([int(amount) * val for amount, val in betsDict.items()]) # amount bet by opponent
+                        diffSum = lastSum - prevSum # difference that still needs to be paid
+                        diffDict = Chips.Chips().valueToChips(diffSum)
+                        self.chips.betChips(diffDict, pot)
+                    else:
+                        self.chips.betChips(betsDict, pot)
                     self.decision = 'raise'
                     return betsDict
                 elif int(choice) == 3:

@@ -127,6 +127,7 @@ class Hand:
         i = 0
         while i < 4 and fold == False:
             for player in self.players: player.resetDecision()
+            for player in self.players: player.resetDecision()
 
             currentPlayer = int(not self.bigBlind) # big blind plays last
             lastBet = {'5' : 1} if i == 0 else {'0' : 0}
@@ -141,6 +142,7 @@ class Hand:
                     fold = True
                     break
                 elif self.players[currentPlayer].decision == 'bet' or self.players[currentPlayer].decision == 'raise':
+                    self.players[currentPlayer].prevBet = lastBet
                     self.players[int(not currentPlayer)].decision = None
                     currentPlayer = int(not currentPlayer)
                 else:
