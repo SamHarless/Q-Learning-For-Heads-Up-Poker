@@ -1,9 +1,10 @@
-def Chips():
+class Chips:
     def __init__(self):
         # give same starting chips to every player
         # key is monetary value : value is amount of chips
 
         self.denoms = ['5', '25', '100', '500', '1000']
+        self.lowestDenom = self.denoms[0]
 
         self.chips = {
             self.denoms[0] : 40,
@@ -15,22 +16,22 @@ def Chips():
     
     def betChips(self, amountBetDict, pot):
         # if player bets 5$, amountBetDict = {'5' : 1}
-        for (chipValue, chipAmount) in amountBetDict:
+        for (chipValue, chipAmount) in amountBetDict.items():
             if self.chips[chipValue] - chipAmount >= 0:
                 self.chips[chipValue] = self.chips[chipValue] - chipAmount
-                pot.add(getTotal(amountBetDict))
+                pot.add(sum([int(amount) * val for amount, val in amountBetDict.items()]))
             else:
                 print("You do not have enough chips to bet!")
     
     def getTotal(self):
-        return sum([int(amount) * val for amount, val in self.chips])
+        return sum([int(amount) * val for amount, val in self.chips.items()])
     
     def bigBlind(self, pot):
         self.chips[self.lowestDenom] = self.chips[self.lowestDenom] - 1
         pot.add(int(self.lowestDenom))
     
     def addChips(self, amountDict):
-        for (chipValue, chipAmount) in amountDict:
+        for (chipValue, chipAmount) in amountDict.items():
             self.chips[chipValue] = self.chips[chipValue] + chipAmount
 
     def valueToChips(self, potValue):
@@ -40,4 +41,7 @@ def Chips():
             potValue = potValue - (int(denom) * amount)
             chipDict[denom] = amount
         return chipDict
+
+    def __str__(self):
+        return '\n'.join([f"{amount} {value}$ chips" for value, amount in self.chips.items()])
             

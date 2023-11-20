@@ -16,8 +16,3 @@ class Deck(object):
     def drawTop(self):
         return self.cards.pop(0)
         
-
-myDeck = Deck()
-myDeck.shuffle()
-print(myDeck.cards)
-print(myDeck.draw_top())
