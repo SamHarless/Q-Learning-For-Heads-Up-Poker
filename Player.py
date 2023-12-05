@@ -1,6 +1,10 @@
+import numpy as np
 from Card import Card
 import random
+import pygad
 import Chips
+import random
+import Deck
 
 class Player(object):
     def __init__(self, id):
@@ -9,6 +13,7 @@ class Player(object):
         self.hand = []
         self.prevBet = 0
         self.decision = None
+        self.game_over = False
     
     def assignHand(self, deck):
         self.hand = [deck.drawTop(), deck.drawTop()]
@@ -17,7 +22,7 @@ class Player(object):
         # used for back and forth betting
         self.decision = None
 
-    def play(self, pot, lastBet):
+    def play(self, pot, lastBet, currBoard):
         print("Your hand is " + str(self.hand))
         numLastBet = sum([int(amount) * val for amount, val in lastBet.items()])
         choice = 3
@@ -100,3 +105,55 @@ class Player(object):
         return {'0' : 0}
             
 
+class AIPlayer(Player):
+    def __init__(self, id, hasht):
+        super().__init__(id)
+        self.hashTable = hasht
+
+
+    def play(self, pot, lastBet, currBoard):
+        numLastBet = sum([int(amount) * val for amount, val in lastBet.items()])
+
+        input_data = np.array([[self.hashTable[str(card)] for card in self.hand] + [self.hashTable[str(card)] for card in currBoard]])
+
+        predictions = pygad.nn.predict(last_layer=self.gann.population_networks[self.idx],
+                                   data_inputs=input_data)
+        choice = np.argmax(predictions)
+
+        if choice == 0:
+            self.decision = 'check'
+        elif choice == 1:
+            #AI BET MORE CHIPS IF HAND IS GOOD
+            successfulBet = self.chips.betChips({'5': 1}, pot)
+            if successfulBet:
+                self.decision = 'bet'
+            else:
+                self.game_over = True
+        elif choice == 2:
+            self.decision = 'fold'
+
+        return {'0': 0}
+    def passParams(self, gann, idx):
+        self.gann = gann
+        self.idx = idx
+
+class randomPlayer(Player):
+    def __init__(self, id):
+        super().__init__(id)
+
+    def play(self, pot, lastBet, currBoard):
+        
+        choice = random.randint(0, 20)
+        numLastBet = sum([int(amount) * val for amount, val in lastBet.items()])
+
+        if choice > 0 and choice < 14:
+            self.decision = 'check'
+        elif choice >= 14 and choice < 19:
+            successfulBet = self.chips.betChips({'5': random.randint(1,3)}, pot)
+            if successfulBet:
+                self.decision = 'bet'
+            else:
+                self.game_over = True
+        elif choice > 19:
+            self.decision = 'fold'
+        return {'0': 0}

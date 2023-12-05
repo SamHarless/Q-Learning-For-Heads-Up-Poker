@@ -3,15 +3,15 @@ class Chips:
         # give same starting chips to every player
         # key is monetary value : value is amount of chips
 
-        self.denoms = ['5', '25', '100', '500', '1000']
+        self.denoms = ['5']
         self.lowestDenom = self.denoms[0]
 
         self.chips = {
-            self.denoms[0] : 40,
-            self.denoms[1] : 40,
-            self.denoms[2] : 40,
-            self.denoms[3] : 20,
-            self.denoms[4] : 10
+            self.denoms[0] : 2000
+            # self.denoms[1] : 40,
+            # self.denoms[2] : 40,
+            # self.denoms[3] : 20,
+            # self.denoms[4] : 10
         }
     
     def betChips(self, amountBetDict, pot):
@@ -20,8 +20,10 @@ class Chips:
             if self.chips[chipValue] - chipAmount >= 0:
                 self.chips[chipValue] = self.chips[chipValue] - chipAmount
                 pot.add(sum([int(amount) * val for amount, val in amountBetDict.items()]))
+                return True
             else:
                 print("You do not have enough chips to bet!")
+                return False
     
     def getTotal(self):
         return sum([int(amount) * val for amount, val in self.chips.items()])
