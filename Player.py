@@ -25,7 +25,7 @@ class Player(object):
         # used for back and forth betting
         self.decision = None
 
-    def play(self, pot, lastBet, currBoard, verbose =False):
+    def play(self, pot, lastBet, currBoard, verbose =False, historyDict={}):
         print("Your hand is " + str(self.hand))
         numLastBet = sum([int(amount) * val for amount, val in lastBet.items()])
         choice = 3
@@ -114,10 +114,13 @@ class AIPlayer(Player):
         self.hashTable = hasht
 
 
-    def play(self, pot, lastBet, currBoard, verbose = False):
+    def play(self, pot, lastBet, currBoard, verbose = False, historyList=[]):
         numLastBet = sum([int(amount) * val for amount, val in lastBet.items()])
 
-        input_data = np.array([[self.hashTable[str(card)] for card in self.hand] + [self.hashTable[str(card)] for card in currBoard]])
+        #input_data = np.concatenate([[self.hashTable[str(card)] for card in self.hand],[self.hashTable[str(card)] for card in currBoard], historyList])
+        input_data = np.array([[self.hashTable[str(card)] for card in self.hand] + [self.hashTable[str(card)] for card in currBoard]+historyList])
+
+
 
         prediction = sum(pygad.nn.predict(last_layer=self.gann.population_networks[self.idx],
                                    data_inputs=input_data))
@@ -142,7 +145,7 @@ class AIPlayer(Player):
                 if verbose: print("AI Player bets", betAmount)
 
                 if self.chips.betChips({'5',chipsRounded},pot):
-                    return {'5', chipsRounded}
+                    return {'5': chipsRounded}
                 else:#if not enough chips to bet the amount they want, go all in
                     amount = self.chips.allIn(pot)
                     self.game_over = True
@@ -156,13 +159,13 @@ class AIPlayer(Player):
                 self.decision = 'fold'
                 if verbose: print("AI player folds w/", self.hand)
 
-                return {'0',0}#returning this because I think it needs to return something, but the lastBet should no longer matter because the player folded
+                return {'0': 0}#returning this because I think it needs to return something, but the lastBet should no longer matter because the player folded
             
             if prediction < 100:
                 chipsToCall = numLastBet / 5
                 if self.chips.betChips({'5', chipsToCall},pot):
                     if verbose: print("AI player calls w/", self.hand)
-                    return {'5', chipsToCall}
+                    return {'5': chipsToCall}
                 else:#not enought chips to call, so go all in!
                     amount = self.chips.allIn(pot)
                     self.game_over = True
@@ -181,7 +184,7 @@ class AIPlayer(Player):
 
                 if self.chips.betChips({'5', chipsRounded},pot):
                     if verbose: print("AI Player raises", reRaiseAmount)
-                    return {'5',chipsRounded}
+                    return {'5': chipsRounded}
                 else:
                     amount = self.chips.allIn(pot)
                     self.game_over = True
@@ -198,7 +201,7 @@ class randomPlayer(Player):
     def __init__(self, id):
         super().__init__(id)
 
-    def play(self, pot, lastBet, currBoard, verbose = False):
+    def play(self, pot, lastBet, currBoard, verbose = False, historyDict={}):
         
         choice = random.randint(0, 20)
         numLastBet = sum([int(amount) * val for amount, val in lastBet.items()])

@@ -115,6 +115,11 @@ class Hand:
 
         return -1
 
+    def fillWithZeros(self, list):
+        
+        while len(list) < 10:
+            list.append(0)
+        return list
     
     def startHand(self, verbose=False):
         #print("START HAND")
@@ -123,6 +128,8 @@ class Hand:
         # deal cards
         self.players[self.bigBlind].assignHand(self.deck)
         self.players[int(not self.bigBlind)].assignHand(self.deck)
+
+        self.history = []
 
         fold = False
         i = 0
@@ -136,7 +143,11 @@ class Hand:
 
             while self.decisionsMade() == False:
                 if verbose: print("Current Player is " + str(currentPlayer)) #comment out for train
-                lastBet = self.players[currentPlayer].play(self.pot, lastBet, self.showBoard(), verbose)
+                lastBet = self.players[currentPlayer].play(self.pot, lastBet, self.showBoard(), verbose, self.fillWithZeros(self.history))
+
+                if len(lastBet) !=0:
+                    if sum([int(amount) * val for amount, val in lastBet.items()]) != 0:
+                        self.history.append(sum([int(amount) * val for amount, val in lastBet.items()]))
 
                 if self.players[currentPlayer].decision == 'fold':
                     fold = True

@@ -115,9 +115,9 @@ class AIvsRandomGame():
 
 
 class AIvsAIGame():
-    def __init__(self):
+    def __init__(self, population_vectorsIN = None, loading=False):
         self.bigBlind = 0 if random.randint(0,1) == 0 else 1
-        num_inputs = 7
+        num_inputs = 17
         output_size = 1 # Three actions: check, bet, fold
         hidden_layer_size = 10
         num_solutions = 10
@@ -145,14 +145,16 @@ class AIvsAIGame():
 
         self.dictToStoreBattleScores={}
               
-
-        population_vectors = pygad.gann.population_as_vectors(population_networks=GANN_instance.population_networks)
+        if loading:
+            population_vectors = population_vectorsIN
+        else:
+            population_vectors = pygad.gann.population_as_vectors(population_networks=GANN_instance.population_networks)
 
         initial_population = population_vectors.copy()
 
         num_parents_mating = 4
 
-        num_generations = 30
+        num_generations = 500
 
         mutation_percent_genes = 35
 
@@ -180,8 +182,8 @@ class AIvsAIGame():
                             keep_parents=keep_parents,
                             on_generation=self.callback_generation)
         
-    def loadGAInstance(self, fileName):
-        self.ga_instance = pygad.load(filename=fileName)
+    
+
     
     def train(self):
 
@@ -288,6 +290,12 @@ class AIvsAIGame():
 # hi.run()
 
 
-tryLoadedModel = AIvsAIGame()
-tryLoadedModel.train()
-tryLoadedModel.playVsHuman()
+ga_instance = pygad.load(filename='savedModel')
+
+model = AIvsAIGame(ga_instance.population, loading = True)
+
+#model = AIvsAIGame()
+
+model.train()
+
+model.playVsRandom()
