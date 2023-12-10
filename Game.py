@@ -152,7 +152,7 @@ class AIvsAIGame():
 
         num_parents_mating = 4
 
-        num_generations = 10
+        num_generations = 30
 
         mutation_percent_genes = 35
 
@@ -289,5 +289,5 @@ class AIvsAIGame():
 
 
 tryLoadedModel = AIvsAIGame()
-tryLoadedModel.loadGAInstance('savedModel')
+tryLoadedModel.train()
 tryLoadedModel.playVsHuman()

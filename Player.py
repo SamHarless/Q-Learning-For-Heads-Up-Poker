@@ -119,22 +119,34 @@ class AIPlayer(Player):
 
         input_data = np.array([[self.hashTable[str(card)] for card in self.hand] + [self.hashTable[str(card)] for card in currBoard]])
 
-        prediction = pygad.nn.predict(last_layer=self.gann.population_networks[self.idx],
-                                   data_inputs=input_data)
+        prediction = sum(pygad.nn.predict(last_layer=self.gann.population_networks[self.idx],
+                                   data_inputs=input_data))
+        
         
 
+        if self.chips.getTotal() == 0:
+            self.decision = 'check'
+            self.game_over = True
+            return {'0': 0}
         #if AI player has option to check (not bet to/raised)
-        if True: #putting if true as a placeholder
+        if numLastBet == 0: 
 
             if prediction < 20:
                 self.decision = 'check'
                 if verbose: print("AI player checks w/", self.hand)
+                return {'0': 0} # return 0 as the lastBet
             
-            else:
-
+            else:#BET
                 betAmount = pot.value * (prediction * .01)
                 chipsRounded = round(betAmount / 5)
                 if verbose: print("AI Player bets", betAmount)
+
+                if self.chips.betChips({'5',chipsRounded},pot):
+                    return {'5', chipsRounded}
+                else:#if not enough chips to bet the amount they want, go all in
+                    amount = self.chips.allIn(pot)
+                    self.game_over = True
+                    return {'5': round(amount/5)}
 
 
 
@@ -143,10 +155,20 @@ class AIPlayer(Player):
             if prediction < 50:
                 self.decision = 'fold'
                 if verbose: print("AI player folds w/", self.hand)
+
+                return {'0',0}#returning this because I think it needs to return something, but the lastBet should no longer matter because the player folded
             
             if prediction < 100:
-                self.decision = 'call'
-                if verbose: print("AI player calls w/", self.hand)
+                chipsToCall = numLastBet / 5
+                if self.chips.betChips({'5', chipsToCall},pot):
+                    if verbose: print("AI player calls w/", self.hand)
+                    return {'5', chipsToCall}
+                else:#not enought chips to call, so go all in!
+                    amount = self.chips.allIn(pot)
+                    self.game_over = True
+                    if verbose: print("AI player goes all in for", amount, "with", self.hand)
+                    return {'5': round(amount/5)}
+                
             
             else:#reraise
                 self.decision = 'bet'
@@ -155,8 +177,16 @@ class AIPlayer(Player):
                 betToPlayer = 5
 
                 reRaiseAmount = betToPlayer * (2*(prediction * .01))
-                chipsRounded = round(betAmount / 5)
-                if verbose: print("AI Player raises", betAmount)
+                chipsRounded = round(reRaiseAmount / 5)
+
+                if self.chips.betChips({'5', chipsRounded},pot):
+                    if verbose: print("AI Player raises", reRaiseAmount)
+                    return {'5',chipsRounded}
+                else:
+                    amount = self.chips.allIn(pot)
+                    self.game_over = True
+                    if verbose: print("AI player goes all in for", amount, "with", self.hand)
+                    return {'5': round(amount/5)}
 
         return {'0': 0}
         #return {'5', chipsRounded} i think this is what this would look like.. 

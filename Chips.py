@@ -41,6 +41,14 @@ class Chips:
             self.denoms[0] : 2000,
         }
 
+    def allIn(self, pot):
+
+        addAmount=(sum([int(amount) * val for amount, val in self.chips]))
+        pot.add(addAmount)
+        self.chips.clear()
+
+        return addAmount
+
 
     def valueToChips(self, potValue):
         chipDict = {}
