@@ -45,7 +45,7 @@ class AIvsRandomGame():
                                         num_neurons_hidden_layers=[hidden_layer_size],
                                         num_neurons_output=output_size,
                                         hidden_activations=["relu"],
-                                        output_activation="softmax")
+                                        output_activation=None)#change to have no activation function on output so that it just generrates a numbr
 
         def fitness_func(ga_instance, solution, solution_idx):
             print("FITNESS FUNCTION")
@@ -118,7 +118,7 @@ class AIvsAIGame():
     def __init__(self):
         self.bigBlind = 0 if random.randint(0,1) == 0 else 1
         num_inputs = 7
-        output_size = 3  # Three actions: check, bet, fold
+        output_size = 1 # Three actions: check, bet, fold
         hidden_layer_size = 10
         num_solutions = 10
         self.num_solutions = num_solutions

@@ -119,26 +119,47 @@ class AIPlayer(Player):
 
         input_data = np.array([[self.hashTable[str(card)] for card in self.hand] + [self.hashTable[str(card)] for card in currBoard]])
 
-        predictions = pygad.nn.predict(last_layer=self.gann.population_networks[self.idx],
+        prediction = pygad.nn.predict(last_layer=self.gann.population_networks[self.idx],
                                    data_inputs=input_data)
-        choice = np.argmax(predictions)
+        
 
-        if choice == 0:
-            self.decision = 'check'
-            if verbose: print("AI Player Checks w/", self.hand)
-        elif choice == 1:
-            #AI BET MORE CHIPS IF HAND IS GOOD
-            successfulBet = self.chips.betChips({'5': 1}, pot)
-            if successfulBet:
-                self.decision = 'bet'
-                if verbose: print("AI Player bets")
+        #if AI player has option to check (not bet to/raised)
+        if True: #putting if true as a placeholder
+
+            if prediction < 20:
+                self.decision = 'check'
+                if verbose: print("AI player checks w/", self.hand)
+            
             else:
-                self.game_over = True
-        elif choice == 2:
-            if verbose: print("AI Player folds")
-            self.decision = 'fold'
+
+                betAmount = pot.value * (prediction * .01)
+                chipsRounded = round(betAmount / 5)
+                if verbose: print("AI Player bets", betAmount)
+
+
+
+        else: 
+
+            if prediction < 50:
+                self.decision = 'fold'
+                if verbose: print("AI player folds w/", self.hand)
+            
+            if prediction < 100:
+                self.decision = 'call'
+                if verbose: print("AI player calls w/", self.hand)
+            
+            else:#reraise
+                self.decision = 'bet'
+
+                #placeholder, replace with actual
+                betToPlayer = 5
+
+                reRaiseAmount = betToPlayer * (2*(prediction * .01))
+                chipsRounded = round(betAmount / 5)
+                if verbose: print("AI Player raises", betAmount)
 
         return {'0': 0}
+        #return {'5', chipsRounded} i think this is what this would look like.. 
     def passParams(self, gann, idx):
         self.gann = gann
         self.idx = idx
