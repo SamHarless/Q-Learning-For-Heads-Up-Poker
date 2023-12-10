@@ -152,7 +152,7 @@ class AIvsAIGame():
 
         num_parents_mating = 4
 
-        num_generations = 20
+        num_generations = 10
 
         mutation_percent_genes = 35
 
@@ -181,12 +181,12 @@ class AIvsAIGame():
                             on_generation=self.callback_generation)
         
     def loadGAInstance(self, fileName):
-        self.ga_instance = pygad.GA.load(filename=fileName)
+        self.ga_instance = pygad.load(filename=fileName)
     
     def train(self):
 
         self.ga_instance.run()
-
+        self.ga_instance.save('savedModel')
         
 
     def fitness_func(self, ga_instance, solution, solution_idx):
@@ -220,7 +220,7 @@ class AIvsAIGame():
 
 
                     sumOfChipsPlayer1 += self.players[1].chips.getTotal()
-                    self.dictToStoreBattleScores[(solution_idx,i)]=sumOfChipsPlayer1
+                    self.dictToStoreBattleScores[(solution_idx,i)]= self.players[1].chips.getTotal()
                     self.dictToStoreBattleScores[(i,solution_idx)]=self.players[0].chips.getTotal()
 
                     self.players[0].resetChipsTo2000()
@@ -231,15 +231,15 @@ class AIvsAIGame():
 
         
     def callback_generation(self,ga_instance):
-        #("CALLBACK FUNCTION")
+        #print("CALLBACK FUNCTION")
 
         GANN_instance = self.GANN_instance
-
+        #(self.dictToStoreBattleScores)
         self.dictToStoreBattleScores.clear()
         population_matrices = pygad.gann.population_as_matrices(population_networks=GANN_instance.population_networks, population_vectors=ga_instance.population)
         GANN_instance.update_population_trained_weights(population_trained_weights=population_matrices)
 
-        ga_instance.save('savedModel')
+        
         print(f"Generation = {ga_instance.generations_completed}")
         #print(f"Fitness    = {ga_instance.best_solution()[1]}")
 
@@ -257,18 +257,37 @@ class AIvsAIGame():
                 numOfHands += 1
                 self.bigBlind = int(not self.bigBlind)
 
-            print("This test against the random player has finshed, AI player finished w/ ",self.players[1].chips.getTotal())
+        
+            print("This test against the random player has finshed, AI player finished w/ ",self.players[1].chips.getTotal(), "Random player finished w/", self.players[0].chips.getTotal())
+            #reset each player to the correct amount of chips
+            self.players[0].resetChipsTo2000()
+            self.players[1].resetChipsTo2000()
+
+    def playVsHuman(self):
+        self.players2 = [Player.Player(0), self.players[1]]
+        
+        self.bigBlind = 0 if random.randint(0,1) == 0 else 1
+
+    
+        solution_idx = self.ga_instance.best_solution()[2]
+        while self.players2[0].chips.getTotal() > 0 and self.players2[1].chips.getTotal() > 0:
+            self.deck = Deck.Deck()
+            self.deck.shuffle()
+            self.players2[1].passParams(self.GANN_instance, solution_idx)
+            currentHand = Hand.Hand(self.players2, self.deck, self.bigBlind)
+            currentHand.startHand(verbose = True)
+            self.bigBlind = int(not self.bigBlind)
 
 
 
 
-
-
-
-
-
-hi = AIvsAIGame()
-hi.train()
-hi.playVsRandom()
+#hi = AIvsAIGame()
+#hi.train()
+#hi.playVsRandom()
 # hi = HumanGame()
 # hi.run()
+
+
+tryLoadedModel = AIvsAIGame()
+tryLoadedModel.loadGAInstance('savedModel')
+tryLoadedModel.playVsHuman()

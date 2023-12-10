@@ -116,7 +116,8 @@ class Hand:
         return -1
 
     
-    def startHand(self):
+    def startHand(self, verbose=False):
+        #print("START HAND")
         # get big blind from player
         self.players[self.bigBlind].chips.bigBlind(self.pot)
         # deal cards
@@ -131,11 +132,11 @@ class Hand:
             currentPlayer = int(not self.bigBlind) # big blind plays last
             lastBet = {'5' : 1} if i == 0 else {'0' : 0}
             # print("\n\n\n\n\n\n\n")
-            # print("The current board is: " + str(self.showBoard())) comment out for train
+            if verbose: print("The current board is: " + str(self.showBoard())) #comment out for train
 
             while self.decisionsMade() == False:
-                # print("Current Player is " + str(currentPlayer)) comment out for train
-                lastBet = self.players[currentPlayer].play(self.pot, lastBet, self.showBoard())
+                if verbose: print("Current Player is " + str(currentPlayer)) #comment out for train
+                lastBet = self.players[currentPlayer].play(self.pot, lastBet, self.showBoard(), verbose)
 
                 if self.players[currentPlayer].decision == 'fold':
                     fold = True
@@ -191,12 +192,12 @@ class Hand:
             #player 
             chipDict = self.players[1].chips.valueToChips(morePotValueHalf)
             self.players[1].chips.addChips(chipDict)
-            # print("\nTie! The pot was chopped!")
+            if verbose: print("\nTie! The pot was chopped!")
         else:
             potValue = self.pot.getValue()
             chipDict = self.players[winner].chips.valueToChips(potValue)
             self.players[winner].chips.addChips(chipDict)
-            # print("\nPlayer " + str(winner) + " won the hand! The pot was worth " + str(potValue))
+            if verbose: print("\nPlayer " + str(winner) + " won the hand! The pot was worth " + str(potValue))
         
 
         

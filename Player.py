@@ -25,7 +25,7 @@ class Player(object):
         # used for back and forth betting
         self.decision = None
 
-    def play(self, pot, lastBet, currBoard):
+    def play(self, pot, lastBet, currBoard, verbose =False):
         print("Your hand is " + str(self.hand))
         numLastBet = sum([int(amount) * val for amount, val in lastBet.items()])
         choice = 3
@@ -114,7 +114,7 @@ class AIPlayer(Player):
         self.hashTable = hasht
 
 
-    def play(self, pot, lastBet, currBoard):
+    def play(self, pot, lastBet, currBoard, verbose = False):
         numLastBet = sum([int(amount) * val for amount, val in lastBet.items()])
 
         input_data = np.array([[self.hashTable[str(card)] for card in self.hand] + [self.hashTable[str(card)] for card in currBoard]])
@@ -125,14 +125,17 @@ class AIPlayer(Player):
 
         if choice == 0:
             self.decision = 'check'
+            if verbose: print("AI Player Checks w/", self.hand)
         elif choice == 1:
             #AI BET MORE CHIPS IF HAND IS GOOD
             successfulBet = self.chips.betChips({'5': 1}, pot)
             if successfulBet:
                 self.decision = 'bet'
+                if verbose: print("AI Player bets")
             else:
                 self.game_over = True
         elif choice == 2:
+            if verbose: print("AI Player folds")
             self.decision = 'fold'
 
         return {'0': 0}
@@ -144,7 +147,7 @@ class randomPlayer(Player):
     def __init__(self, id):
         super().__init__(id)
 
-    def play(self, pot, lastBet, currBoard):
+    def play(self, pot, lastBet, currBoard, verbose = False):
         
         choice = random.randint(0, 20)
         numLastBet = sum([int(amount) * val for amount, val in lastBet.items()])
