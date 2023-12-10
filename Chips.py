@@ -35,6 +35,12 @@ class Chips:
     def addChips(self, amountDict):
         for (chipValue, chipAmount) in amountDict.items():
             self.chips[chipValue] = self.chips[chipValue] + chipAmount
+    
+    def resetChipsTo2000(self):
+        self.chips ={
+            self.denoms[0] : 2000,
+        }
+
 
     def valueToChips(self, potValue):
         chipDict = {}

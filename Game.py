@@ -47,8 +47,9 @@ class AIvsRandomGame():
                                         output_activation="softmax")
 
         def fitness_func(ga_instance, solution, solution_idx):
+            #print("FITNESS FUNCTION")
             numOfHands = 0
-
+            
             while (self.players[0].game_over == False and self.players[1].game_over == False and numOfHands < 200):
                 self.deck = Deck.Deck()
                 self.deck.shuffle()
@@ -57,7 +58,12 @@ class AIvsRandomGame():
                 currentHand.startHand()
                 numOfHands += 1
                 self.bigBlind = int(not self.bigBlind)
-            return self.players[1].chips.getTotal()
+            print("This fitness function run has finished, player 1 finished w/ ",self.players[1].chips.getTotal())
+            # I think we need to reset each players chips 
+            fitness = self.players[1].chips.getTotal()
+            self.players[0].resetChipsTo2000()
+            self.players[1].resetChipsTo2000()
+            return fitness
         
         def callback_generation(ga_instance):
             population_matrices = pygad.gann.population_as_matrices(population_networks=GANN_instance.population_networks, population_vectors=ga_instance.population)

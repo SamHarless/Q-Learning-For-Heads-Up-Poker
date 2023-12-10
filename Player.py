@@ -17,6 +17,9 @@ class Player(object):
     
     def assignHand(self, deck):
         self.hand = [deck.drawTop(), deck.drawTop()]
+    
+    def resetChipsTo2000(self):
+        self.chips.resetChipsTo2000()
 
     def resetDecision(self):
         # used for back and forth betting
