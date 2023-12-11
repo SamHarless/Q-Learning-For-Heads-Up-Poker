@@ -152,11 +152,11 @@ class AIvsAIGame():
 
         initial_population = population_vectors.copy()
 
-        num_parents_mating = 4
+        num_parents_mating = 2
 
-        num_generations = 500
+        num_generations = 100
 
-        mutation_percent_genes = 35
+        mutation_percent_genes = 10
 
         parent_selection_type = "sss"
 
@@ -199,18 +199,18 @@ class AIvsAIGame():
         
         sumOfChipsPlayer1 =0
         
-        for i in range(num_solutions):
+        for i in range(num_solutions):#Loop over all the individuals in the population
 
-            if i != solution_idx:
+            if i != solution_idx:#make sure it does not try and play itself
                 
-                if (solution_idx, i) in self.dictToStoreBattleScores:
+                if (solution_idx, i) in self.dictToStoreBattleScores: #Uses a dictionary to store the "battles" between individuals to save work
                     sumOfChipsPlayer1 += self.dictToStoreBattleScores[(solution_idx,i)]
-                    #print("saving work")
+                    
 
                 else:
-                   # print("doing work")
+                   
                     numOfHands=0
-                    while (self.players[0].game_over == False and self.players[1].game_over == False and numOfHands < 200):
+                    while (self.players[0].game_over == False and self.players[1].game_over == False and numOfHands < 200):#play 200 hands against this individual
                         self.deck = Deck.Deck()
                         self.deck.shuffle()
                         self.players[0].passParams(GANN_instance, i)#pass i as the solution id to make it play the other individuals
@@ -222,13 +222,13 @@ class AIvsAIGame():
 
 
                     sumOfChipsPlayer1 += self.players[1].chips.getTotal()
-                    self.dictToStoreBattleScores[(solution_idx,i)]= self.players[1].chips.getTotal()
+                    self.dictToStoreBattleScores[(solution_idx,i)]= self.players[1].chips.getTotal()#updates dictionary to save work
                     self.dictToStoreBattleScores[(i,solution_idx)]=self.players[0].chips.getTotal()
 
-                    self.players[0].resetChipsTo2000()
+                    self.players[0].resetChipsTo2000()#reset the players chips because this game is over
                     self.players[1].resetChipsTo2000()
         
-        return (sumOfChipsPlayer1/(num_solutions-1))
+        return (sumOfChipsPlayer1/(num_solutions-1))#Return fitness = average performance of this individual vs all other individuals
     
 
         
@@ -250,7 +250,7 @@ class AIvsAIGame():
 
         for solution_idx in range(self.num_solutions):
             numOfHands =0
-            while (self.players[0].game_over == False and self.players[1].game_over == False and numOfHands < 200):
+            while (self.players[0].game_over == False and self.players[1].game_over == False and numOfHands < 400):
                 self.deck = Deck.Deck()
                 self.deck.shuffle()
                 self.players[1].passParams(self.GANN_instance, solution_idx)

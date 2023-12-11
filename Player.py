@@ -207,7 +207,21 @@ class randomPlayer(Player):
         numLastBet = sum([int(amount) * val for amount, val in lastBet.items()])
 
         if choice > 0 and choice < 14:
-            self.decision = 'check'
+            numLastBet = sum([int(amount) * val for amount, val in lastBet.items()])
+            if numLastBet == 0:
+                self.decision = 'check'
+            else:#call
+                chipsToCall = numLastBet / 5
+                if self.chips.betChips({'5', chipsToCall},pot):
+                    
+                    return {'5': chipsToCall}
+                else:#not enought chips to call, so go all in!
+                    amount = self.chips.allIn(pot)
+                    self.game_over = True
+                    
+                    return {'5': round(amount/5)}
+
+
         elif choice >= 14 and choice < 19:
             successfulBet = self.chips.betChips({'5': random.randint(1,3)}, pot)
             if successfulBet:
