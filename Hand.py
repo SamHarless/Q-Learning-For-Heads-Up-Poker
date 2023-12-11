@@ -116,6 +116,9 @@ class Hand:
         return -1
 
     def fillWithZeros(self, list):
+
+        if len(list) > 10:
+            return list[-10:]
         
         while len(list) < 10:
             list.append(0)

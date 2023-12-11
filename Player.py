@@ -144,7 +144,7 @@ class AIPlayer(Player):
                 chipsRounded = round(betAmount / 5)
                 if verbose: print("AI Player bets", betAmount)
 
-                if self.chips.betChips({'5',chipsRounded},pot):
+                if self.chips.betChips({'5':chipsRounded},pot):
                     return {'5': chipsRounded}
                 else:#if not enough chips to bet the amount they want, go all in
                     amount = self.chips.allIn(pot)
@@ -163,7 +163,7 @@ class AIPlayer(Player):
             
             if prediction < 100:
                 chipsToCall = numLastBet / 5
-                if self.chips.betChips({'5', chipsToCall},pot):
+                if self.chips.betChips({'5': chipsToCall},pot):
                     if verbose: print("AI player calls w/", self.hand)
                     return {'5': chipsToCall}
                 else:#not enought chips to call, so go all in!
@@ -182,7 +182,7 @@ class AIPlayer(Player):
                 reRaiseAmount = betToPlayer * (2*(prediction * .01))
                 chipsRounded = round(reRaiseAmount / 5)
 
-                if self.chips.betChips({'5', chipsRounded},pot):
+                if self.chips.betChips({'5': chipsRounded},pot):
                     if verbose: print("AI Player raises", reRaiseAmount)
                     return {'5': chipsRounded}
                 else:
@@ -212,7 +212,7 @@ class randomPlayer(Player):
                 self.decision = 'check'
             else:#call
                 chipsToCall = numLastBet / 5
-                if self.chips.betChips({'5', chipsToCall},pot):
+                if self.chips.betChips({'5': chipsToCall},pot):
                     
                     return {'5': chipsToCall}
                 else:#not enought chips to call, so go all in!
